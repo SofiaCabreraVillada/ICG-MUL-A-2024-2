@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Figuras Geométricas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .figure {
+            position: absolute;
+        }
+        #svg-container, #canvas-container {
+            position: relative;
+            width: 48%;
+            height: 500px;
+            border: 1px solid #ccc;
+            overflow: hidden;
+        }
+        #buttons {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Crear Figuras Geométricas</h1>
+
+    <label for="shape">Tipo de Figura:</label>
+    <select id="shape">
+        <option value="circle">Círculo</option>
+        <option value="square">Cuadrado</option>
+        <option value="rectangle">Rectángulo</option>
+        <option value="triangle">Triángulo</option>
+        <option value="ellipse">Elipse</option>
+    </select>
+
+    <label for="size">Tamaño:</label>
+    <input type="number" id="size" value="100" min="10">
+
+    <label for="color">Color de Relleno:</label>
+    <input type="color" id="color" value="#0000ff">
+
+    <label for="borderColor">Color del Borde:</label>
+    <input type="color" id="borderColor" value="#000000">
+
+    <label for="borderWidth">Ancho del Borde:</label>
+    <input type="number" id="borderWidth" value="2" min="0">
+
+    <label for="positionX">Posición X:</label>
+    <input type="number" id="positionX" value="50" min="0">
+
+    <label for="positionY">Posición Y:</label>
+    <input type="number" id="positionY" value="50" min="0">
+
+    <label for="type">Tipo:</label>
+    <select id="type">
+        <option value="svg">Vectorizada (SVG)</option>
+        <option value="canvas">Rasterizada (Canvas)</option>
+    </select>
+
+    <div id="borders">
+        <p>Estilo del Borde:</p>
+        <label>
+            <input type="radio" name="borderStyle" value="solid" checked> Sólido
+        </label>
+        <label>
+            <input type="radio" name="borderStyle" value="dashed"> Guiones
+        </label>
+        <label>
+            <input type="radio" name="borderStyle" value="dotted"> Punteado
+        </label>
+    </div>
+
+    <div id="styles">
+        <p>Estilos adicionales:</p>
+        <label>
+            <input type="checkbox" id="rounded" value="rounded"> Bordes Redondeados
+        </label>
+    </div>
+
+    <div id="buttons">
+        <button id="createBtn">Crear Figura</button>
+        <button id="clearBtn">Borrar Figuras</button>
+    </div>
+
+    <div id="container">
+        <div id="svg-container"></div>
+        <div id="canvas-container"></div>
+    </div>
+
+    <script>
+        document.getElementById('createBtn').addEventListener('click', function() {
+            const shape = document.getElementById('shape').value;
+            const size = parseInt(document.getElementById('size').value);
+            const color = document.getElementById('color').value;
+            const borderColor = document.getElementById('borderColor').value;
+            const borderWidth = parseInt(document.getElementById('borderWidth').value);
+            const borderStyle = document.querySelector('input[name="borderStyle"]:checked').value;
+            const rounded = document.getElementById('rounded').checked;
+            const posX = parseInt(document.getElementById('positionX').value);
+            const posY = parseInt(document.getElementById('positionY').value);
+            const type = document.getElementById('type').value;
+            let figure;
+
+            if (type === 'svg') {
+                const svgWrapper = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                figure = document.createElementNS('http://www.w3.org/2000/svg', shape === 'circle' ? 'circle' : shape === 'ellipse' ? 'ellipse' : 'polygon');
+                
+                svgWrapper.setAttribute('width', size);
+                svgWrapper.setAttribute('height', size);
+                svgWrapper.style.position = 'absolute';
+                svgWrapper.style.left = posX + 'px';
+                svgWrapper.style.top = posY + 'px';
+
+                if (shape === 'circle') {
+                    figure.setAttribute('cx', size / 2);
+                    figure.setAttribute('cy', size / 2);
+                    figure.setAttribute('r', size / 2);
+                } else if (shape === 'ellipse') {
+                    figure.setAttribute('cx', size / 2);
+                    figure.setAttribute('cy', size / 2);
+                    figure.setAttribute('rx', size / 2);
+                    figure.setAttribute('ry', size / 4);
+                } else if (shape === 'square' || shape === 'rectangle') {
+                    figure.setAttribute('points', `0,0 ${size},0 ${size},${shape === 'rectangle' ? size / 2 : size} 0,${shape === 'rectangle' ? size / 2 : size}`);
+                } else if (shape === 'triangle') {
+                    figure.setAttribute('points', `0,${size} ${size},${size} ${size / 2},0`);
+                }
+
+                figure.setAttribute('fill', color);
+                figure.setAttribute('stroke', borderColor);
+                figure.setAttribute('stroke-width', borderWidth);
+                figure.setAttribute('stroke-dasharray', borderStyle === 'dashed' ? '4' : borderStyle === 'dotted' ? '1,2' : '0');
+
+                if (rounded) {
+                    figure.setAttribute('rx', size / 10);
+                    figure.setAttribute('ry', size / 10);
+                }
+
+                svgWrapper.appendChild(figure);
+                document.getElementById('svg-container').appendChild(svgWrapper);
+
+            } else if (type === 'canvas') {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = size;
+                canvas.height = shape === 'rectangle' ? size / 2 : size;
+
+                canvas.style.position = 'absolute';
+                canvas.style.left = posX + 'px';
+                canvas.style.top = posY + 'px';
+
+                ctx.fillStyle = color;
+                ctx.strokeStyle = borderColor;
+                ctx.lineWidth = borderWidth;
+
+                if (borderStyle === 'dashed') {
+                    ctx.setLineDash([6, 6]);
+                } else if (borderStyle === 'dotted') {
+                    ctx.setLineDash([2, 2]);
+                }
+
+                ctx.beginPath();
+
+                if (shape === 'circle') {
+                    ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+                } else if (shape === 'ellipse') {
+                    ctx.ellipse(size / 2, size / 2, size / 2, size / 4, 0, 0, Math.PI * 2);
+                } else if (shape === 'square' || shape === 'rectangle') {
+                    ctx.rect(0, 0, size, shape === 'rectangle' ? size / 2 : size);
+                } else if (shape === 'triangle') {
+                    ctx.moveTo(0, size);
+                    ctx.lineTo(size, size);
+                    ctx.lineTo(size / 2, 0);
+                    ctx.closePath();
+                }
+
+                if (rounded) {
+                    ctx.lineJoin = 'round';
+                    ctx.lineCap = 'round';
+                }
+
+                ctx.fill();
+                ctx.stroke();
+
+                document.getElementById('canvas-container').appendChild(canvas);
+            }
+        });
+
+        document.getElementById('clearBtn').addEventListener('click', function() {
+            const svgContainer = document.getElementById('svg-container');
+            const canvasContainer = document.getElementById('canvas-container');
+
+            // Borrar todas las figuras de SVG y Canvas
+            while (svgContainer.firstChild) {
+                svgContainer.removeChild(svgContainer.firstChild);
+            }
+            while (canvasContainer.firstChild) {
+                canvasContainer.removeChild(canvasContainer.firstChild);
+            }
+        });
+    </script>
+
+</body>
+</html>
