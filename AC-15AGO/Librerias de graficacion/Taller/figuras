@@ -1,1 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Figuras Geométricas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .figure {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Crear Figuras Geométricas</h1>
+
+    <label for="shape">Tipo de Figura:</label>
+    <select id="shape">
+        <option value="circle">Círculo</option>
+        <option value="square">Cuadrado</option>
+        <option value="rectangle">Rectángulo</option>
+    </select>
+
+    <label for="size">Tamaño:</label>
+    <input type="number" id="size" value="100" min="10">
+
+    <label for="type">Tipo:</label>
+    <select id="type">
+        <option value="svg">Vectorizada (SVG)</option>
+        <option value="canvas">Rasterizada (Canvas)</option>
+    </select>
+
+    <button id="createBtn">Crear Figura</button>
+
+    <div id="container"></div>
+
+    <script>
+        document.getElementById('createBtn').addEventListener('click', function() {
+            const shape = document.getElementById('shape').value;
+            const size = parseInt(document.getElementById('size').value);
+            const type = document.getElementById('type').value;
+            const container = document.getElementById('container');
+            let figure;
+
+            if (type === 'svg') {
+                figure = document.createElementNS('http://www.w3.org/2000/svg', shape === 'circle' ? 'circle' : 'rect');
+                const svgWrapper = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svgWrapper.setAttribute('width', size);
+                svgWrapper.setAttribute('height', size);
+
+                if (shape === 'circle') {
+                    figure.setAttribute('cx', size / 2);
+                    figure.setAttribute('cy', size / 2);
+                    figure.setAttribute('r', size / 2);
+                } else {
+                    figure.setAttribute('width', size);
+                    figure.setAttribute('height', shape === 'rectangle' ? size / 2 : size);
+                }
+
+                figure.setAttribute('fill', 'blue');
+                svgWrapper.appendChild(figure);
+                container.appendChild(svgWrapper);
+
+            } else if (type === 'canvas') {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = size;
+                canvas.height = shape === 'rectangle' ? size / 2 : size;
+
+                ctx.fillStyle = 'red';
+                
+                if (shape === 'circle') {
+                    ctx.beginPath();
+                    ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    ctx.fillRect(0, 0, size, shape === 'rectangle' ? size / 2 : size);
+                }
+
+                container.appendChild(canvas);
+            }
+        });
+    </script>
+
+</body>
+</html>
 
