@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trazado de polígonos regulares</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .form-container {
+            margin-bottom: 15px;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-group label, .form-group select, .form-group input {
+            display: block;
+            margin-bottom: 5px;
+        }
+        #botones {
+            margin-top: 10px;
+        }
+        #botones button {
+            padding: 5px 10px;
+            margin-right: 5px;
+        }
+        #svgContainer, #lienzo {
+            margin-top: 20px;
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Trazado de polígonos regulares</h1>
+        <div class="form-group">
+            <label for="lados">Número de lados:</label>
+            <input type="number" id="lados" value="5" min="3">
+        </div>
+        <div class="form-group">
+            <label for="tamano">Tamaño (radio):</label>
+            <input type="number" id="tamano" value="50" min="10">
+        </div>
+        <div class="form-group">
+            <label for="tipoCoordenadas">Tipo de coordenadas:</label>
+            <select id="tipoCoordenadas">
+                <option value="cartesianas">Cartesianas (X, Y)</option>
+                <option value="polares">Polares (Radio, Ángulo)</option>
+            </select>
+        </div>
+        <div id="coordenadasCartesianas" class="form-group">
+            <label for="posicionX">Posición en X:</label>
+            <input type="number" id="posicionX" value="100" min="0">
+            <label for="posicionY">Posición en Y:</label>
+            <input type="number" id="posicionY" value="100" min="0">
+        </div>
+        <div id="coordenadasPolares" class="form-group" style="display: none;">
+            <label for="radio">Radio:</label>
+            <input type="number" id="radio" value="100" min="0">
+            <label for="angulo">Ángulo (grados):</label>
+            <input type="number" id="angulo" value="0" min="0" max="360">
+        </div>
+        <div class="form-group">
+            <label for="tipoImagen">Tipo de imagen:</label>
+            <select id="tipoImagen">
+                <option value="rasterizada">Rasterizada</option>
+                <option value="vectorizada">Vectorizada (SVG)</option>
+            </select>
+        </div>
+        <div id="botones">
+            <button id="crearBtn">Crear Figura</button>
+            <button id="borrarBtn">Borrar Figuras</button>
+        </div>
+    </div>
+    <canvas id="lienzo" width="400" height="400" style="display: none;"></canvas>
+    <div id="svgContainer" style="width: 400px; height: 400px; display: none;"></div>
+    
+    <script>
+       
+        const ladosInput = document.getElementById('lados');
+        const tamanoInput = document.getElementById('tamano');
+        const tipoCoordenadas = document.getElementById('tipoCoordenadas');
+        const coordenadasCartesianas = document.getElementById('coordenadasCartesianas');
+        const coordenadasPolares = document.getElementById('coordenadasPolares');
+        const posicionXInput = document.getElementById('posicionX');
+        const posicionYInput = document.getElementById('posicionY');
+        const radioInput = document.getElementById('radio');
+        const anguloInput = document.getElementById('angulo');
+        const tipoImagen = document.getElementById('tipoImagen');
+        const crearBtn = document.getElementById('crearBtn');
+        const borrarBtn = document.getElementById('borrarBtn');
+        const lienzo = document.getElementById('lienzo');
+        const ctx = lienzo.getContext('2d');
+        const svgContainer = document.getElementById('svgContainer');
+
+       
+        tipoCoordenadas.addEventListener('change', () => {
+            if (tipoCoordenadas.value === 'cartesianas') {
+                coordenadasCartesianas.style.display = 'block';
+                coordenadasPolares.style.display = 'none';
+            } else {
+                coordenadasCartesianas.style.display = 'none';
+                coordenadasPolares.style.display = 'block';
+            }
+        });
+
+        // Función para convertir coordenadas polares a cartesianas
+        function convertirPolaresACartesianas(radio, angulo) {
+            const anguloEnRadianes = (angulo * Math.PI) / 180;
+            const x = radio * Math.cos(anguloEnRadianes);
+            const y = radio * Math.sin(anguloEnRadianes);
+            return { x, y };
+        }
+
+       
+        function dibujarPoligonoCanvas(x, y, radio, lados) {
+            const anguloInicial = Math.PI / 2; // Ángulo inicial para hacer la base horizontal
+            const angulo = (2 * Math.PI) / lados;
+            ctx.beginPath();
+            ctx.moveTo(x + radio * Math.cos(anguloInicial), y - radio * Math.sin(anguloInicial));
+
+            for (let i = 1; i < lados; i++) {
+                ctx.lineTo(
+                    x + radio * Math.cos(anguloInicial + i * angulo),
+                    y - radio * Math.sin(anguloInicial + i * angulo)
+                );
+            }
+
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+       
+        function dibujarPoligonoSVG(x, y, radio, lados) {
+            const anguloInicial = Math.PI / 2; // Ángulo inicial para hacer la base horizontal
+            const angulo = (2 * Math.PI) / lados;
+            let puntos = '';
+
+            for (let i = 0; i < lados; i++) {
+                const xPunto = x + radio * Math.cos(anguloInicial + i * angulo);
+                const yPunto = y - radio * Math.sin(anguloInicial + i * angulo);
+                puntos += `${xPunto},${yPunto} `;
+            }
+
+            const svg = `
+                <svg width="400" height="400">
+                    <polygon points="${puntos}" style="fill:none;stroke:black;stroke-width:1" />
+                </svg>`;
+            svgContainer.innerHTML = svg;
+        }
+
+        
+        crearBtn.addEventListener('click', () => {
+            const lados = parseInt(ladosInput.value);
+            const tamano = parseInt(tamanoInput.value);
+            let x, y;
+
+            if (tipoCoordenadas.value === 'cartesianas') {
+                x = parseInt(posicionXInput.value);
+                y = parseInt(posicionYInput.value);
+            } else {
+                const radio = parseInt(radioInput.value);
+                const angulo = parseInt(anguloInput.value);
+                const coordenadas = convertirPolaresACartesianas(radio, angulo);
+                x = coordenadas.x + lienzo.width / 2;
+                y = coordenadas.y + lienzo.height / 2;
+            }
+
+            if (tipoImagen.value === 'rasterizada') {
+                lienzo.style.display = 'block';
+                svgContainer.style.display = 'none';
+                dibujarPoligonoCanvas(x, y, tamano, lados);
+            } else {
+                lienzo.style.display = 'none';
+                svgContainer.style.display = 'block';
+                dibujarPoligonoSVG(x, y, tamano, lados);
+            }
+        });
+
+     
+        borrarBtn.addEventListener('click', () => {
+            ctx.clearRect(0, 0, lienzo.width, lienzo.height);
+            svgContainer.innerHTML = '';
+        });
+    </script>
+</body>
+</html>
+
