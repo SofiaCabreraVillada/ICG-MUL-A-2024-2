@@ -1,92 +1,84 @@
+// Clase para crear y dibujar una línea en SVG
 class Linea {
     #x1;
     #y1;
     #x2;
     #y2;
-    #svg;
 
-    constructor(x1, y1, x2, y2, svg) {
+    constructor(x1, y1, x2, y2) {
         this.#x1 = x1;
         this.#y1 = y1;
         this.#x2 = x2;
         this.#y2 = y2;
-        this.#svg = svg;
     }
 
-    dibujar() {
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', this.#x1);
-        line.setAttribute('y1', this.#y1);
-        line.setAttribute('x2', this.#x2);
-        line.setAttribute('y2', this.#y2);
-        line.setAttribute('stroke', 'black');
-        line.setAttribute('stroke-width', 1);
-        this.#svg.appendChild(line);
+    // Genera el texto SVG para la línea
+    crearSVG() {
+        return `<line x1="${this.#x1}" y1="${this.#y1}" x2="${this.#x2}" y2="${this.#y2}" stroke="black" stroke-width="1"/>`;
     }
 }
 
+// Clase para crear y dibujar una circunferencia en SVG
 class Circunferencia {
     #cx;
     #cy;
     #r;
-    #svg;
 
-    constructor(cx, cy, r, svg) {
+    constructor(cx, cy, r) {
         this.#cx = cx;
         this.#cy = cy;
         this.#r = r;
-        this.#svg = svg;
     }
 
-    dibujar() {
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('cx', this.#cx);
-        circle.setAttribute('cy', this.#cy);
-        circle.setAttribute('r', this.#r);
-        circle.setAttribute('stroke', 'black');
-        circle.setAttribute('stroke-width', 1);
-        circle.setAttribute('fill', 'none'); // Cambiar a 'black' para llenarla
-        this.#svg.appendChild(circle);
+    // Genera el texto SVG para la circunferencia
+    crearSVG() {
+        return `<circle cx="${this.#cx}" cy="${this.#cy}" r="${this.#r}" stroke="black" stroke-width="1" fill="none"/>`;
     }
 }
 
+// Clase para crear y dibujar una elipse en SVG
 class Elipse {
     #cx;
     #cy;
     #a;
     #b;
-    #svg;
 
-    constructor(cx, cy, a, b, svg) {
+    constructor(cx, cy, a, b) {
         this.#cx = cx;
         this.#cy = cy;
         this.#a = a;
         this.#b = b;
-        this.#svg = svg;
     }
 
-    dibujar() {
-        const ellipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-        ellipse.setAttribute('cx', this.#cx);
-        ellipse.setAttribute('cy', this.#cy);
-        ellipse.setAttribute('rx', this.#a);
-        ellipse.setAttribute('ry', this.#b);
-        ellipse.setAttribute('stroke', 'black');
-        ellipse.setAttribute('stroke-width', 1);
-        ellipse.setAttribute('fill', 'none'); // Cambiar a 'black' para llenarla
-        this.#svg.appendChild(ellipse);
+    // Genera el texto SVG para la elipse
+    crearSVG() {
+        return `<ellipse cx="${this.#cx}" cy="${this.#cy}" rx="${this.#a}" ry="${this.#b}" stroke="black" stroke-width="1" fill="none"/>`;
     }
 }
 
-// Uso de las clases
-const svg = document.getElementById('svgCanvas');
+// Función para generar el contenido SVG y agregarlo al contenedor
+function dibujarSVG() {
+    const svgNamespace = 'http://www.w3.org/2000/svg';
+    const svgCanvas = document.getElementById('svgCanvas');
 
-const linea = new Linea(50, 50, 200, 200, svg);
-linea.dibujar();
+    // Crear instancias de las primitivas
+    const linea = new Linea(50, 50, 200, 200);
+    const circunferencia = new Circunferencia(300, 100, 50);
+    const elipse = new Elipse(400, 300, 80, 50);
 
-const circunferencia = new Circunferencia(300, 100, 50, svg);
-circunferencia.dibujar();
+    // Generar el contenido SVG como una cadena
+    const contenidoSVG = `
+        <svg xmlns="${svgNamespace}" width="500" height="500">
+            ${linea.crearSVG()}
+            ${circunferencia.crearSVG()}
+            ${elipse.crearSVG()}
+        </svg>
+    `;
 
-const elipse = new Elipse(400, 300, 80, 50, svg);
-elipse.dibujar();
+    // Insertar el contenido SVG en el contenedor
+    svgCanvas.innerHTML = contenidoSVG;
+}
+
+// Llamada a la función para dibujar las primitivas
+dibujarSVG();
 
