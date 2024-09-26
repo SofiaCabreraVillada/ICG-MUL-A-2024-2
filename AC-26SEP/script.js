@@ -1,4 +1,4 @@
-/// Clase Punto
+// Clase Punto
 class Punto {
     constructor(x, y) {
         this.x = x;
@@ -50,7 +50,10 @@ class SVGDrawer {
             const theta = (i / numPuntos) * 2 * Math.PI;
             const x = cx + a * Math.cos(theta);
             const y = cy + b * Math.sin(theta);
-            new Punto(x, y).dibujar(this.svgCanvas);
+            // Dibuja los puntos de la elipse, pero no el centro
+            if (i > 0) { // Evitar dibujar el punto central
+                new Punto(x, y).dibujar(this.svgCanvas);
+            }
         }
     }
 
@@ -63,10 +66,6 @@ class SVGDrawer {
 // Crear el SVG
 const svgCanvas = document.getElementById('svgCanvas');
 
-// Asegúrate de que el SVG tenga un tamaño adecuado
-svgCanvas.setAttribute('width', '600');
-svgCanvas.setAttribute('height', '400');
-
 // Instanciar la clase SVGDrawer
 const drawer = new SVGDrawer(svgCanvas);
 
@@ -74,5 +73,5 @@ const drawer = new SVGDrawer(svgCanvas);
 drawer.dibujarLinea(50, 50, 200, 200);
 drawer.dibujarCircunferencia(300, 100, 50);
 drawer.dibujarElipse(400, 300, 80, 50);
-drawer.dibujarPunto(400, 300);
+
 
