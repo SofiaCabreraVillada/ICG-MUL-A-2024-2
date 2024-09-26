@@ -1,131 +1,78 @@
-// Clase para crear y dibujar una línea en SVG usando el algoritmo de Bresenham
-class Linea {
-    #x1;
-    #y1;
-    #x2;
-    #y2;
-
-    constructor(x1, y1, x2, y2) {
-        this.#x1 = x1;
-        this.#y1 = y1;
-        this.#x2 = x2;
-        this.#y2 = y2;
+/// Clase Punto
+class Punto {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
     }
 
-    // Genera un elemento SVG <polyline> utilizando el algoritmo de Bresenham
-    crearElementoSVG() {
-        const puntos = this.#algoritmoBresenham();
-        const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-        const puntosStr = puntos.map(([x, y]) => `${x},${y}`).join(' ');
-        polyline.setAttribute('points', puntosStr);
-        polyline.setAttribute('stroke', 'black');
-        polyline.setAttribute('stroke-width', '1');
-        polyline.setAttribute('fill', 'none');
-        return polyline;
+    // Método para crear un punto usando una línea muy corta
+    dibujar(svgCanvas) {
+        const punto = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+        punto.setAttribute('x1', this.x);
+        punto.setAttribute('y1', this.y);
+        punto.setAttribute('x2', this.x + 1);  // Pequeño desplazamiento en x
+        punto.setAttribute('y2', this.y + 1);  // Pequeño desplazamiento en y
+        punto.setAttribute('stroke', 'black');
+        punto.setAttribute('stroke-width', 2);  // Grosor ajustado para que parezca un punto
+        svgCanvas.appendChild(punto);
+    }
+}
+
+// Clase SVGDrawer para manejar el dibujo usando puntos
+class SVGDrawer {
+    constructor(svgCanvas) {
+        this.svgCanvas = svgCanvas;
     }
 
-    // Algoritmo de Bresenham para trazar la línea
-    #algoritmoBresenham() {
-        const puntos = [];
-        let x1 = this.#x1;
-        let y1 = this.#y1;
-        const x2 = this.#x2;
-        const y2 = this.#y2;
-
-        const dx = Math.abs(x2 - x1);
-        const dy = Math.abs(y2 - y1);
-        const sx = (x1 < x2) ? 1 : -1;
-        const sy = (y1 < y2) ? 1 : -1;
-        let err = dx - dy;
-
-        while (true) {
-            puntos.push([x1, y1]);
-            if (x1 === x2 && y1 === y2) break;
-            const err2 = 2 * err;
-            if (err2 > -dy) {
-                err -= dy;
-                x1 += sx;
-            }
-            if (err2 < dx) {
-                err += dx;
-                y1 += sy;
-            }
+    // Dibujar una línea como una secuencia de puntos
+    dibujarLinea(x1, y1, x2, y2, numPuntos = 100) {
+        for (let i = 0; i <= numPuntos; i++) {
+            const t = i / numPuntos;
+            const x = x1 + t * (x2 - x1);
+            const y = y1 + t * (y2 - y1);
+            new Punto(x, y).dibujar(this.svgCanvas);
         }
-        return puntos;
+    }
+
+    // Dibujar una circunferencia usando puntos
+    dibujarCircunferencia(cx, cy, r, numPuntos = 100) {
+        for (let i = 0; i <= numPuntos; i++) {
+            const theta = (i / numPuntos) * 2 * Math.PI;
+            const x = cx + r * Math.cos(theta);
+            const y = cy + r * Math.sin(theta);
+            new Punto(x, y).dibujar(this.svgCanvas);
+        }
+    }
+
+    // Dibujar una elipse usando puntos
+    dibujarElipse(cx, cy, a, b, numPuntos = 100) {
+        for (let i = 0; i <= numPuntos; i++) {
+            const theta = (i / numPuntos) * 2 * Math.PI;
+            const x = cx + a * Math.cos(theta);
+            const y = cy + b * Math.sin(theta);
+            new Punto(x, y).dibujar(this.svgCanvas);
+        }
+    }
+
+    // Dibujar un solo punto
+    dibujarPunto(x, y) {
+        new Punto(x, y).dibujar(this.svgCanvas);
     }
 }
 
-// Clase para crear y dibujar una circunferencia en SVG usando la ecuación de la circunferencia
-class Circunferencia {
-    #cx;
-    #cy;
-    #r;
+// Crear el SVG
+const svgCanvas = document.getElementById('svgCanvas');
 
-    constructor(cx, cy, r) {
-        this.#cx = cx;
-        this.#cy = cy;
-        this.#r = r;
-    }
+// Asegúrate de que el SVG tenga un tamaño adecuado
+svgCanvas.setAttribute('width', '600');
+svgCanvas.setAttribute('height', '400');
 
-    // Genera un elemento SVG <circle>
-    crearElementoSVG() {
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('cx', this.#cx);
-        circle.setAttribute('cy', this.#cy);
-        circle.setAttribute('r', this.#r);
-        circle.setAttribute('stroke', 'black');
-        circle.setAttribute('stroke-width', '1');
-        circle.setAttribute('fill', 'none');
-        return circle;
-    }
-}
+// Instanciar la clase SVGDrawer
+const drawer = new SVGDrawer(svgCanvas);
 
-// Clase para crear y dibujar una elipse en SVG usando la ecuación de la elipse
-class Elipse {
-    #cx;
-    #cy;
-    #a;
-    #b;
-
-    constructor(cx, cy, a, b) {
-        this.#cx = cx;
-        this.#cy = cy;
-        this.#a = a;
-        this.#b = b;
-    }
-
-    // Genera un elemento SVG <ellipse>
-    crearElementoSVG() {
-        const ellipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-        ellipse.setAttribute('cx', this.#cx);
-        ellipse.setAttribute('cy', this.#cy);
-        ellipse.setAttribute('rx', this.#a);
-        ellipse.setAttribute('ry', this.#b);
-        ellipse.setAttribute('stroke', 'black');
-        ellipse.setAttribute('stroke-width', '1');
-        ellipse.setAttribute('fill', 'none');
-        return ellipse;
-    }
-}
-
-// Función para generar el contenido SVG y agregarlo al contenedor
-function dibujarSVG() {
-    const svgCanvas = document.getElementById('svgCanvas'); // Obtener el contenedor del SVG
-
-    // Crear instancias de las primitivas
-    const linea = new Linea(50, 50, 200, 200);
-    const circunferencia = new Circunferencia(300, 100, 50);
-    const elipse = new Elipse(400, 300, 80, 50);
-
-    // Crear y añadir los elementos SVG al canvas
-    svgCanvas.appendChild(linea.crearElementoSVG());
-    svgCanvas.appendChild(circunferencia.crearElementoSVG());
-    svgCanvas.appendChild(elipse.crearElementoSVG());
-}
-
-// Llamada a la función para dibujar las primitivas una vez que el DOM esté cargado
-document.addEventListener('DOMContentLoaded', dibujarSVG);
-
-
-
+// Dibujar las primitivas usando puntos
+drawer.dibujarLinea(50, 50, 200, 200);
+drawer.dibujarCircunferencia(300, 100, 50);
+drawer.dibujarElipse(400, 300, 80, 50);
+drawer.dibujarPunto(400, 300);
 
