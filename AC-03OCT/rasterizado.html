@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Polígonos</title>
+    <style>
+        #canvas {
+            border: 1px solid black;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dibujo de Polígono Rasterizado Aleatorio </h1>
+    <canvas id="canvas" width="600" height="400"></canvas>
+    <div style="text-align: center; margin-top: 10px;">
+        <button id="btnDibujar">Generar Polígono</button>
+        <button id="btnConexiones" style="margin-left: 10px;">Trazar Conexiones</button>
+        <p id="resultado" style="margin-top: 10px; font-weight: bold;"></p>
+    </div>
+
+    <script src="rasterizado.js"></script>
+</body>
+</html>
