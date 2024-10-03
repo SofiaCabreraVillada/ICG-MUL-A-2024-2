@@ -1,5 +1,3 @@
-// poligono.js
-
 // Clase Punto con encapsulamiento
 class Punto {
     #x;
@@ -27,8 +25,8 @@ class Punto {
     }
 }
 
-// Función para dibujar el polígono
-function dibujarPoligono(ctx, puntos) {
+// Función para dibujar el polígono y las conexiones al centroide
+function dibujarPoligono(ctx, puntos, centro) {
     if (puntos.length === 0) return;
 
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // Limpiar canvas
@@ -39,7 +37,29 @@ function dibujarPoligono(ctx, puntos) {
         ctx.lineTo(puntos[i].getX(), puntos[i].getY());
     }
     ctx.closePath();
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 2;
     ctx.stroke();
+
+    // Opcional: Rellenar el polígono con un color semitransparente
+    ctx.fillStyle = 'rgba(0, 0, 255, 0.1)';
+    ctx.fill();
+
+    // Dibujar las conexiones desde cada punto al centroide
+    ctx.beginPath();
+    puntos.forEach(punto => {
+        ctx.moveTo(punto.getX(), punto.getY());
+        ctx.lineTo(centro.x, centro.y);
+    });
+    ctx.strokeStyle = 'green';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Dibujar el centroide
+    ctx.beginPath();
+    ctx.arc(centro.x, centro.y, 4, 0, 2 * Math.PI);
+    ctx.fillStyle = 'red';
+    ctx.fill();
 }
 
 // Función para calcular el producto cruzado
@@ -77,15 +97,16 @@ function esConvexo(puntos) {
     return true; // Es convexo
 }
 
+// Función para calcular la orientación de tres puntos
+function orientacion(a, b, c) {
+    const val = (b.getX() - a.getX()) * (c.getY() - a.getY()) - 
+                (b.getY() - a.getY()) * (c.getX() - a.getX());
+    if (val === 0) return 0; // Colinear
+    return (val > 0) ? 1 : 2; // 1: Horario, 2: Anti-horario
+}
+
 // Función para verificar si dos segmentos de línea se cruzan
 function segmentosCruzan(p1, p2, p3, p4) {
-    function orientacion(a, b, c) {
-        const val = (b.getX() - a.getX()) * (c.getY() - a.getY()) - 
-                    (b.getY() - a.getY()) * (c.getX() - a.getX());
-        if (val === 0) return 0; // Colinear
-        return (val > 0) ? 1 : 2; // 1: Horario, 2: Anti-horario
-    }
-
     const o1 = orientacion(p1, p2, p3);
     const o2 = orientacion(p1, p2, p4);
     const o3 = orientacion(p3, p4, p1);
@@ -198,8 +219,11 @@ function generarYDibujarPoligono() {
         }
     } while (!noCruzanLineas(puntos));
 
-    // Dibujar el polígono
-    dibujarPoligono(ctx, puntos);
+    // Calcular el centroide
+    const centro = calcularCentroide(puntos);
+
+    // Dibujar el polígono y las conexiones al centroide
+    dibujarPoligono(ctx, puntos, centro);
 
     // Determinar si es convexo o cóncavo
     const tipo = esConvexo(puntos) ? 'Convexo' : 'Cóncavo';
@@ -217,4 +241,5 @@ function init() {
 
 // Ejecutar la inicialización después de cargar la página
 window.onload = init;
+
 

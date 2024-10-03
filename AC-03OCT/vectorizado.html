@@ -4,16 +4,26 @@
     <meta charset="UTF-8">
     <title>Dibujar Polígono Aleatorio</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
         canvas {
             border: 1px solid black;
+            margin-top: 20px;
         }
         .controls {
             margin-bottom: 10px;
         }
+        #resultado {
+            margin-top: 10px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <h1>Dibujo de Polígono Vectorizado Aleatorio</h1>
+    <h1>Dibujo de Polígono Vectorizado Aleatorio </h1>
     <div class="controls">
         <label for="numPuntos">Número de Puntos:</label>
         <input type="number" id="numPuntos" value="5" min="3" max="20">
@@ -25,6 +35,5 @@
     <script src="vectorizado.js"></script>
 </body>
 </html>
-
 
 
