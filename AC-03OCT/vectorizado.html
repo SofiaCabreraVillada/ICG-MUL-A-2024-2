@@ -2,38 +2,29 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Dibujar Polígono Aleatorio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Polígonos</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 20px;
-        }
-        canvas {
+        #canvas {
             border: 1px solid black;
-            margin-top: 20px;
-        }
-        .controls {
-            margin-bottom: 10px;
-        }
-        #resultado {
-            margin-top: 10px;
-            font-weight: bold;
+            display: block;
+            margin: 0 auto;
         }
     </style>
 </head>
 <body>
     <h1>Dibujo de Polígono Vectorizado Aleatorio </h1>
-    <div class="controls">
-        <label for="numPuntos">Número de Puntos:</label>
-        <input type="number" id="numPuntos" value="5" min="3" max="20">
-        <button id="generarBtn">Generar Polígono Aleatorio</button>
+    <canvas id="canvas" width="600" height="400"></canvas>
+    <div style="text-align: center; margin-top: 10px;">
+        <button id="btnDibujar">Generar Polígono</button>
+        <button id="btnConexiones" style="margin-left: 10px;">Trazar Conexiones</button>
+        <p id="resultado" style="margin-top: 10px; font-weight: bold;"></p>
     </div>
-    <canvas id="canvas" width="600" height="600"></canvas>
-    <p id="resultado"></p>
 
     <script src="vectorizado.js"></script>
 </body>
 </html>
+
+
 
 
