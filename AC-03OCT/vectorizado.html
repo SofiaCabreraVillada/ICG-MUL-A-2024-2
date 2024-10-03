@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dibujar Polígono Aleatorio</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+        .controls {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dibujo de Polígono Vectorizado Aleatorio</h1>
+    <div class="controls">
+        <label for="numPuntos">Número de Puntos:</label>
+        <input type="number" id="numPuntos" value="5" min="3" max="20">
+        <button id="generarBtn">Generar Polígono Aleatorio</button>
+    </div>
+    <canvas id="canvas" width="600" height="600"></canvas>
+    <p id="resultado"></p>
+
+    <script src="vectorizado.js"></script>
+</body>
+</html>
+
+
+
